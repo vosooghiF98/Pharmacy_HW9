@@ -1,9 +1,9 @@
 package org.pharmacy.entities;
 
 public class Admin {
-    int id;
-    String username;
-    String password;
+    private int id;
+    private String username;
+    private String password;
 
     public Admin(String username, String password) {
         this.username = username;

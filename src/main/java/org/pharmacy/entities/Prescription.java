@@ -1,18 +1,18 @@
 package org.pharmacy.entities;
 
 public class Prescription {
-    int id;
-    String name;
-    int quantity;
-    long price;
-    boolean doesExist;
-    boolean isConfirmed;
-    boolean isPaid;
+    private int id;
+    private String name;
+    private int quantity;
+    private long price;
+    private boolean doesExist;
+    private boolean isConfirmed;
+    private boolean isPaid;
 
     public Prescription(String name, int quantity) {
         this.name = name;
         this.quantity = quantity;
-        doesExist = true;
+        price = 0;
         isConfirmed = false;
         isPaid = false;
     }

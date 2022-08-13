@@ -1,8 +1,8 @@
 package org.pharmacy.entities;
 
 public class Patient {
-    int id;
-    String nationalCode;
+    private int id;
+    private String nationalCode;
 
     public Patient(String nationalCode) {
         this.nationalCode = nationalCode;
