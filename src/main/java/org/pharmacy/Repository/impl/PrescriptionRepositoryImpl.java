@@ -2,8 +2,9 @@ package org.pharmacy.Repository.impl;
 
 import org.pharmacy.Repository.PrescriptionRepository;
 import org.pharmacy.config.DBConfig;
+import org.pharmacy.entities.Drug;
+import org.pharmacy.entities.Patient;
 import org.pharmacy.entities.Prescription;
-import org.pharmacy.util.list.PrescriptionList;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,74 +12,121 @@ import java.sql.SQLException;
 
 public class PrescriptionRepositoryImpl implements PrescriptionRepository {
     @Override
-    public void save(Prescription prescription,int patientId) throws SQLException {
+    public void save(Drug drug, Patient patient) throws SQLException {
         String query = """
-                insert into prescription (name, quantity, is_confirmed, is_paid, patient_id)
-                values (?,?,?,?,?)
+                insert into prescription (name, quantity, is_confirmed, is_paid, patient_national_code)
+                values (?,?,false,false,?)
                 """;
         PreparedStatement preparedStatement = DBConfig.getConnection().prepareStatement(query);
-        preparedStatement.setString(1,prescription.getName());
-        preparedStatement.setInt(2,prescription.getQuantity());
-        preparedStatement.setBoolean(3,prescription.isConfirmed());
-        preparedStatement.setBoolean(4,prescription.isPaid());
-        preparedStatement.setInt(5,patientId);
+        preparedStatement.setString(1,drug.getName());
+        preparedStatement.setInt(2,drug.getQuantity());
+        preparedStatement.setString(3, patient.getNationalCode());
         preparedStatement.executeUpdate();
         preparedStatement.close();
     }
 
     @Override
-    public void editPatient(Prescription prescription) throws SQLException {
+    public void editPatient(Drug drug , Patient patient) throws SQLException {
         String query = """
-                update prescription set name = ? , quantity = ?
+                update prescription set name = ? , quantity = ? where patient_national_code = ?
                 """;
         PreparedStatement preparedStatement = DBConfig.getConnection().prepareStatement(query);
-        preparedStatement.setString(1,prescription.getName());
-        preparedStatement.setInt(2,prescription.getQuantity());
+        preparedStatement.setString(1,drug.getName());
+        preparedStatement.setInt(2,drug.getQuantity());
+        preparedStatement.setString(3,patient.getNationalCode());
         preparedStatement.executeUpdate();
         preparedStatement.close();
     }
 
     @Override
-    public void editAdmin(boolean exist ,boolean confirm ,boolean pay) throws SQLException {
+    public void changeExistMode(boolean exist ,String name) throws SQLException {
         String query = """
-                update prescription set dose_exist = ? , is_confirmed = ? , is_paid = ?;
+                update prescription set dose_exist = ? where name = ?;
                 """;
         PreparedStatement preparedStatement = DBConfig.getConnection().prepareStatement(query);
         preparedStatement.setBoolean(1,exist);
-        preparedStatement.setBoolean(2,confirm);
-        preparedStatement.setBoolean(3,pay);
+        preparedStatement.setString(2,name);
         preparedStatement.executeUpdate();
         preparedStatement.close();
     }
 
     @Override
-    public PrescriptionList load(int patientId) throws SQLException {
+    public void changeConfirmMode(boolean confirm, String nationalCode) throws SQLException {
         String query = """
-                select name,quantity,dose_exist,is_confirmed,is_paid from prescription where patient_id = ?
+                update prescription set is_confirmed = true where patient_national_code = ?;
                 """;
         PreparedStatement preparedStatement = DBConfig.getConnection().prepareStatement(query);
-        preparedStatement.setInt(1,patientId);
+        preparedStatement.setString(1,nationalCode);
+        preparedStatement.executeUpdate();
+        preparedStatement.close();
+    }
+
+    @Override
+    public Prescription loadForEdit(Patient patient) throws SQLException {
+        String query = """
+                select name,quantity from prescription where patient_national_code = ? and is_confirmed = false
+                """;
+        PreparedStatement preparedStatement = DBConfig.getConnection().prepareStatement(query);
+        preparedStatement.setString(1, patient.getNationalCode());
         ResultSet resultSet = preparedStatement.executeQuery();
-        PrescriptionList prescriptionList = new PrescriptionList();
+        Prescription prescription = new Prescription();
         while (resultSet.next()){
-            Prescription prescription = new Prescription(resultSet.getString("name"),resultSet.getInt("quantity"));
-            prescription.setDoesExist(resultSet.getBoolean("dose_exist"));
-            prescription.setConfirmed(resultSet.getBoolean("is_confirmed"));
-            prescription.setPaid(resultSet.getBoolean("is_paid"));
-            prescriptionList.add(prescription);
+            Drug drug = new Drug(resultSet.getString("name"),resultSet.getInt("quantity"));
+            prescription.add(drug);
         }
         preparedStatement.close();
-        return prescriptionList;
+        return prescription;
     }
 
     @Override
-    public PrescriptionList loadAll() {
-        return null;
+    public Prescription loadAfterConfirm(Patient patient) throws SQLException {
+        String query = """
+                select name,quantity,dose_exist,price from prescription where patient_national_code = ? and is_confirmed = true and is_paid = false
+                """;
+        PreparedStatement preparedStatement = DBConfig.getConnection().prepareStatement(query);
+        preparedStatement.setString(1, patient.getNationalCode());
+        ResultSet resultSet = preparedStatement.executeQuery();
+        Prescription prescription = new Prescription();
+        while (resultSet.next()){
+            Drug drug = new Drug(resultSet.getString("name"),resultSet.getInt("quantity"));
+            drug.setDoesExist(resultSet.getBoolean("does_exist"));
+            drug.setPrice(resultSet.getLong("price"));
+            drug.setQuantity(resultSet.getInt("quantity"));
+            drug.setTotalPrice();
+            prescription.add(drug);
+        }
+        preparedStatement.close();
+        return prescription;
     }
 
     @Override
-    public void remove(int patientId) {
+    public Prescription loadAll() throws SQLException {
+        String query = """
+                select * from prescription where is_confirmed = false order by patient_national_code
+                """;
+        PreparedStatement preparedStatement = DBConfig.getConnection().prepareStatement(query);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        Prescription prescription = new Prescription();
+        while (resultSet.next()){
+            Drug drug = new Drug(resultSet.getString("name"),resultSet.getInt("quantity"));
+            drug.setQuantity(resultSet.getInt("quantity"));
+            drug.setPrice(resultSet.getLong("price"));
 
+            prescription.add(drug);
+        }
+        preparedStatement.close();
+        return prescription;
+    }
+
+    @Override
+    public void remove(Patient patient) throws SQLException {
+        String query = """
+                delete from prescription where patient_national_code = ?
+                """;
+        PreparedStatement preparedStatement = DBConfig.getConnection().prepareStatement(query);
+        preparedStatement.setString(1,patient.getNationalCode());
+        preparedStatement.executeUpdate();
+        preparedStatement.close();
     }
 
     @Override
