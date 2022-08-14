@@ -8,12 +8,12 @@ import org.pharmacy.entities.Prescription;
 import java.sql.SQLException;
 
 public interface PrescriptionService {
-    public void save(String name, int quantity, Patient patient) throws SQLException;
-    public void editPrescription(String name, int quantity, Patient patient) throws SQLException;
-    public void changeMode(String mode, boolean change ,String name) throws SQLException;
-    public Prescription load(Patient patient) throws SQLException;
-    public Prescription loadAll() throws SQLException;
-    public void remove(Patient patient) throws SQLException;
+    boolean save(String name, int quantity, Patient patient) throws SQLException;
+    boolean editPrescription(String oldName ,String name, int quantity, Patient patient) throws SQLException;
+    boolean changeMode(String mode, boolean change ,String name) throws SQLException;
+    Prescription load(Patient patient) throws SQLException;
+    Prescription loadAll() throws SQLException;
+    void remove(Patient patient) throws SQLException;
 
 
 

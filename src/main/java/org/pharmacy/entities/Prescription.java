@@ -5,7 +5,7 @@ import org.pharmacy.entities.Drug;
 import java.util.Arrays;
 
 public class Prescription {
-    private Drug[] prescriptions = new Drug[1000];
+    private Drug[] prescriptions = new Drug[10];
     int index = 0;
 
     public void add(Drug prescription) {
@@ -25,6 +25,15 @@ public class Prescription {
 
     public int size(){
         return index;
+    }
+
+    public boolean contains(String name){
+        for (int i = 0; i < size(); i++) {
+            if (name == prescriptions[i].getName()){
+                return true;
+            }
+        }
+        return false;
     }
 
 

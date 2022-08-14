@@ -10,14 +10,14 @@ import java.sql.SQLException;
 
 public class AdminRepositoryImpl implements AdminRepository {
     @Override
-    public void save(String username, String password) throws SQLException {
+    public void save(Admin admin) throws SQLException {
         String query = """
                 insert into admin (username, password)
                 values (?,?)
                 """;
         PreparedStatement preparedStatement = DBConfig.getConnection().prepareStatement(query);
-        preparedStatement.setString(1,username);
-        preparedStatement.setString(2,password);
+        preparedStatement.setString(1, admin.getUsername());
+        preparedStatement.setString(2, admin.getPassword());
         preparedStatement.executeUpdate();
         preparedStatement.close();
     }
@@ -33,6 +33,18 @@ public class AdminRepositoryImpl implements AdminRepository {
             return new Admin(username,password);
         }
         return null;
+    }
+    @Override
+    public boolean loadByUsername(String username) throws SQLException {
+        String query = """
+                select * from admin where username = ?
+                """;
+        PreparedStatement preparedStatement = DBConfig.getConnection().prepareStatement(query);
+        ResultSet resultSet = preparedStatement.executeQuery();
+        if (resultSet.next()){
+            return false;
+        }
+        return true;
     }
 
     @Override

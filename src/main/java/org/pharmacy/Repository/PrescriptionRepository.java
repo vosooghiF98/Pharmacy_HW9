@@ -8,8 +8,8 @@ import java.sql.SQLException;
 
 public interface PrescriptionRepository {
     void save(Drug drug, Patient patient) throws SQLException;
-    void editePrescription(Drug drug , Patient patient) throws SQLException;
-    void changeExistMode(boolean exist ,String name) throws SQLException;
+    void editPrescription(String oldName, Drug newDrug, Patient patient) throws SQLException;
+    void changeExistMode(boolean exist , String name) throws SQLException;
     void changeConfirmMode(boolean confirm ,String nationalCode) throws SQLException;
     void changePaymentMode(boolean pay ,String nationalCode) throws SQLException;
     Prescription loadBeforeConfirm(Patient patient) throws SQLException;

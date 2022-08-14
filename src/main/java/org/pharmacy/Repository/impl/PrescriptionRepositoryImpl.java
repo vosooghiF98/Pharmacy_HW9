@@ -26,14 +26,15 @@ public class PrescriptionRepositoryImpl implements PrescriptionRepository {
     }
 
     @Override
-    public void editePrescription(Drug drug , Patient patient) throws SQLException {
+    public void editPrescription(String oldName, Drug newDrug, Patient patient) throws SQLException {
         String query = """
-                update prescription set name = ? , quantity = ? where patient_national_code = ?
+                update prescription set name = ? , quantity = ? where patient_national_code = ? and name = ?
                 """;
         PreparedStatement preparedStatement = DBConfig.getConnection().prepareStatement(query);
-        preparedStatement.setString(1,drug.getName());
-        preparedStatement.setInt(2,drug.getQuantity());
+        preparedStatement.setString(1,newDrug.getName());
+        preparedStatement.setInt(2,newDrug.getQuantity());
         preparedStatement.setString(3,patient.getNationalCode());
+        preparedStatement.setString(4,oldName);
         preparedStatement.executeUpdate();
         preparedStatement.close();
     }

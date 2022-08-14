@@ -12,28 +12,38 @@ import java.sql.SQLException;
 public class PrescriptionServiceImpl implements PrescriptionService {
     PrescriptionRepository prescriptionRepository = new PrescriptionRepositoryImpl();
     @Override
-    public void save(String name, int quantity, Patient patient) throws SQLException {
-        while (prescriptionRepository.loadBeforeConfirm(patient).size() <= 10) {
+    public boolean save(String name, int quantity, Patient patient) throws SQLException {
+        if (prescriptionRepository.loadBeforeConfirm(patient).size() < 10 && !load(patient).contains(name)) {
             Drug drug = new Drug(name, quantity);
             prescriptionRepository.save(drug, patient);
+            return true;
         }
+        return false;
     }
 
     @Override
-    public void editPrescription(String name, int quantity, Patient patient) throws SQLException {
+    public boolean editPrescription(String oldName,String name, int quantity, Patient patient) throws SQLException {
         Drug drug = new Drug(name,quantity);
-        prescriptionRepository.editePrescription(drug,patient);
+        if (load(patient).contains(oldName)) {
+            prescriptionRepository.editPrescription(oldName, drug, patient);
+            return true;
+        }
+        return false;
     }
 
     @Override
-    public void changeMode(String mode, boolean change, String name) throws SQLException {
-        if (mode.equalsIgnoreCase("exist")){
-            prescriptionRepository.changeExistMode(change,name);
-        }else if (mode.equalsIgnoreCase("confirm")){
-            prescriptionRepository.changeConfirmMode(change,name);
-        }else if (mode.equalsIgnoreCase("pay")){
-            prescriptionRepository.changePaymentMode(change,name);
+    public boolean changeMode(String mode, boolean change, String name) throws SQLException {
+        if (loadAll().contains(name)) {
+            if (mode.equalsIgnoreCase("exist")) {
+                prescriptionRepository.changeExistMode(change, name);
+            } else if (mode.equalsIgnoreCase("confirm")) {
+                prescriptionRepository.changeConfirmMode(change, name);
+            } else if (mode.equalsIgnoreCase("pay")) {
+                prescriptionRepository.changePaymentMode(change, name);
+            }
+            return true;
         }
+        return false;
     }
 
     @Override
