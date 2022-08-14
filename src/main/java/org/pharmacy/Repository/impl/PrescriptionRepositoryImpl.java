@@ -26,7 +26,7 @@ public class PrescriptionRepositoryImpl implements PrescriptionRepository {
     }
 
     @Override
-    public void editPatient(Drug drug , Patient patient) throws SQLException {
+    public void editePrescription(Drug drug , Patient patient) throws SQLException {
         String query = """
                 update prescription set name = ? , quantity = ? where patient_national_code = ?
                 """;
@@ -62,7 +62,18 @@ public class PrescriptionRepositoryImpl implements PrescriptionRepository {
     }
 
     @Override
-    public Prescription loadForEdit(Patient patient) throws SQLException {
+    public void changePaymentMode(boolean pay, String nationalCode) throws SQLException {
+        String query = """
+                update prescription set is_paid = true where patient_national_code = ?;
+                """;
+        PreparedStatement preparedStatement = DBConfig.getConnection().prepareStatement(query);
+        preparedStatement.setString(1,nationalCode);
+        preparedStatement.executeUpdate();
+        preparedStatement.close();
+    }
+
+    @Override
+    public Prescription loadBeforeConfirm(Patient patient) throws SQLException {
         String query = """
                 select name,quantity from prescription where patient_national_code = ? and is_confirmed = false
                 """;
