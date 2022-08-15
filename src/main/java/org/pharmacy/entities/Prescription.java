@@ -1,26 +1,25 @@
 package org.pharmacy.entities;
 
-import org.pharmacy.entities.Drug;
-
 import java.util.Arrays;
+import java.util.Objects;
 
 public class Prescription {
-    private Drug[] prescriptions = new Drug[10];
+    private Drug[] drugs = new Drug[10];
     int index = 0;
 
     public void add(Drug prescription) {
-        if (index > prescriptions.length - 1) {
-            prescriptions = Arrays.copyOf(prescriptions, prescriptions.length * 2);
+        if (index > drugs.length - 1) {
+            drugs = Arrays.copyOf(drugs, drugs.length * 2);
         }
-        prescriptions[index] = prescription;
+        drugs[index] = prescription;
         index++;
     }
 
     public void remove(int id) {
         if (id < index) {
-            prescriptions[id] = null;
+            drugs[id] = null;
         }
-        if (index - id >= 0) System.arraycopy(prescriptions, id + 1, prescriptions, id, index - id);
+        if (index - id >= 0) System.arraycopy(drugs, id + 1, drugs, id, index - id);
     }
 
     public int size(){
@@ -29,12 +28,30 @@ public class Prescription {
 
     public boolean contains(String name){
         for (int i = 0; i < size(); i++) {
-            if (name == prescriptions[i].getName()){
+            if (Objects.equals(name, drugs[i].getName())){
                 return true;
             }
         }
         return false;
     }
-
-
+    public String getName(int index){
+        return drugs[index].getName();
+    }
+    public void prescriptionPrice(){
+        long prescriptionPrice = 0;
+        for (int i = 0; i < size(); i++) {
+            prescriptionPrice += drugs[i].getTotalPrice();
+        }
+        System.out.println("The Total Amount Payable For This Prescription is : " + prescriptionPrice);
+    }
+    @Override
+    public String toString() {
+        if (size() != 0) {
+            for (int i = 0; i < size(); i++) {
+                System.out.print(drugs[i].toString());
+            }
+            return "\n";
+        }else
+            return null;
+    }
 }

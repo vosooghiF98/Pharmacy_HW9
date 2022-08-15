@@ -8,6 +8,8 @@ public class Drug {
     private long price;
     private boolean doesExist;
     private long totalPrice;
+
+    private String patientNationalCode;
     public Drug(String name, int quantity) {
         this.name = name;
         this.quantity = quantity;
@@ -53,15 +55,22 @@ public class Drug {
         totalPrice = price*quantity;
     }
 
+    public String getPatientNationalCode() {
+        return patientNationalCode;
+    }
+
+    public void setPatientNationalCode(String patientNationalCode) {
+        this.patientNationalCode = patientNationalCode;
+    }
+
     @Override
     public String toString() {
-        return "Prescription{" +
-                "name='" + name + '\'' +
+        return  "name='" + name + '\'' +
                 ", quantity=" + quantity +
                 ", price=" + price +
                 ", doesExist=" + doesExist +
                 ", totalPrice=" + totalPrice +
-                '}';
+                ", patient's national code=" + patientNationalCode;
     }
 
     @Override

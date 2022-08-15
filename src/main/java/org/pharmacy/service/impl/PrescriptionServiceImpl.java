@@ -13,7 +13,12 @@ public class PrescriptionServiceImpl implements PrescriptionService {
     PrescriptionRepository prescriptionRepository = new PrescriptionRepositoryImpl();
     @Override
     public boolean save(String name, int quantity, Patient patient) throws SQLException {
-        if (prescriptionRepository.loadBeforeConfirm(patient).size() < 10 && !load(patient).contains(name)) {
+        if (load(patient) == null){
+            Drug drug = new Drug(name, quantity);
+            prescriptionRepository.save(drug, patient);
+            return true;
+        }
+        else if (prescriptionRepository.loadBeforeConfirm(patient).size() < 10 && !load(patient).contains(name)) {
             Drug drug = new Drug(name, quantity);
             prescriptionRepository.save(drug, patient);
             return true;
@@ -37,10 +42,19 @@ public class PrescriptionServiceImpl implements PrescriptionService {
             if (mode.equalsIgnoreCase("exist")) {
                 prescriptionRepository.changeExistMode(change, name);
             } else if (mode.equalsIgnoreCase("confirm")) {
-                prescriptionRepository.changeConfirmMode(change, name);
+                prescriptionRepository.changeConfirmMode(name);
             } else if (mode.equalsIgnoreCase("pay")) {
                 prescriptionRepository.changePaymentMode(change, name);
             }
+            return true;
+        }
+        return false;
+    }
+    @Override
+    public boolean addPrice(String name, long price, String nationalCode) throws SQLException {
+        Patient patient = new Patient(nationalCode);
+        if (load(patient).contains(name)) {
+            prescriptionRepository.addPrice(name, price, nationalCode);
             return true;
         }
         return false;

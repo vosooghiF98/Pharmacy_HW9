@@ -52,7 +52,7 @@ public class PrescriptionRepositoryImpl implements PrescriptionRepository {
     }
 
     @Override
-    public void changeConfirmMode(boolean confirm, String nationalCode) throws SQLException {
+    public void changeConfirmMode(String nationalCode) throws SQLException {
         String query = """
                 update prescription set is_confirmed = true where patient_national_code = ?;
                 """;
@@ -69,6 +69,18 @@ public class PrescriptionRepositoryImpl implements PrescriptionRepository {
                 """;
         PreparedStatement preparedStatement = DBConfig.getConnection().prepareStatement(query);
         preparedStatement.setString(1,nationalCode);
+        preparedStatement.executeUpdate();
+        preparedStatement.close();
+    }
+    @Override
+    public void addPrice(String name, long price, String nationalCode) throws SQLException {
+        String query = """
+                update prescription set price = ? where name = ? and patient_national_code = ? and dose_exist = true
+                """;
+        PreparedStatement preparedStatement = DBConfig.getConnection().prepareStatement(query);
+        preparedStatement.setLong(1,price);
+        preparedStatement.setString(2,name);
+        preparedStatement.setString(3,nationalCode);
         preparedStatement.executeUpdate();
         preparedStatement.close();
     }
@@ -93,7 +105,7 @@ public class PrescriptionRepositoryImpl implements PrescriptionRepository {
     @Override
     public Prescription loadAfterConfirm(Patient patient) throws SQLException {
         String query = """
-                select name,quantity,dose_exist,price from prescription where patient_national_code = ? and is_confirmed = true and is_paid = false
+                select name,quantity,dose_exist,price,patient_national_code from prescription where patient_national_code = ? and is_confirmed = true and is_paid = false
                 """;
         PreparedStatement preparedStatement = DBConfig.getConnection().prepareStatement(query);
         preparedStatement.setString(1, patient.getNationalCode());
@@ -101,9 +113,9 @@ public class PrescriptionRepositoryImpl implements PrescriptionRepository {
         Prescription prescription = new Prescription();
         while (resultSet.next()){
             Drug drug = new Drug(resultSet.getString("name"),resultSet.getInt("quantity"));
-            drug.setDoesExist(resultSet.getBoolean("does_exist"));
+            drug.setDoesExist(resultSet.getBoolean("dose_exist"));
             drug.setPrice(resultSet.getLong("price"));
-            drug.setQuantity(resultSet.getInt("quantity"));
+            drug.setPatientNationalCode(resultSet.getString("patient_national_code"));
             drug.setTotalPrice();
             prescription.add(drug);
         }
@@ -121,9 +133,8 @@ public class PrescriptionRepositoryImpl implements PrescriptionRepository {
         Prescription prescription = new Prescription();
         while (resultSet.next()){
             Drug drug = new Drug(resultSet.getString("name"),resultSet.getInt("quantity"));
-            drug.setQuantity(resultSet.getInt("quantity"));
             drug.setPrice(resultSet.getLong("price"));
-
+            drug.setPatientNationalCode(resultSet.getString("patient_national_code"));
             prescription.add(drug);
         }
         preparedStatement.close();
@@ -133,7 +144,7 @@ public class PrescriptionRepositoryImpl implements PrescriptionRepository {
     @Override
     public void remove(Patient patient) throws SQLException {
         String query = """
-                delete from prescription where patient_national_code = ?
+                delete from prescription where patient_national_code = ? and is_paid = false
                 """;
         PreparedStatement preparedStatement = DBConfig.getConnection().prepareStatement(query);
         preparedStatement.setString(1,patient.getNationalCode());
@@ -141,8 +152,4 @@ public class PrescriptionRepositoryImpl implements PrescriptionRepository {
         preparedStatement.close();
     }
 
-    @Override
-    public void refresh() {
-
-    }
 }

@@ -28,6 +28,8 @@ public class AdminRepositoryImpl implements AdminRepository {
                 select * from admin where username = ? and password = ?
                 """;
         PreparedStatement preparedStatement = DBConfig.getConnection().prepareStatement(query);
+        preparedStatement.setString(1,username);
+        preparedStatement.setString(2,password);
         ResultSet resultSet = preparedStatement.executeQuery();
         if (resultSet.next()){
             return new Admin(username,password);
@@ -40,6 +42,7 @@ public class AdminRepositoryImpl implements AdminRepository {
                 select * from admin where username = ?
                 """;
         PreparedStatement preparedStatement = DBConfig.getConnection().prepareStatement(query);
+        preparedStatement.setString(1,username);
         ResultSet resultSet = preparedStatement.executeQuery();
         if (resultSet.next()){
             return false;
@@ -48,13 +51,14 @@ public class AdminRepositoryImpl implements AdminRepository {
     }
 
     @Override
-    public void changePassword(String oldPassword, String newPassword) throws SQLException {
+    public void changePassword(String username, String oldPassword, String newPassword) throws SQLException {
         String query = """
-                update admin set password = ? where password = ?
+                update admin set password = ? where username = ? and password = ?
                 """;
         PreparedStatement preparedStatement = DBConfig.getConnection().prepareStatement(query);
         preparedStatement.setString(1,newPassword);
-        preparedStatement.setString(2,oldPassword);
+        preparedStatement.setString(2,username);
+        preparedStatement.setString(3,oldPassword);
         preparedStatement.executeUpdate();
         preparedStatement.close();
     }

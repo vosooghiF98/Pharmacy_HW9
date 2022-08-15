@@ -20,7 +20,10 @@ public class PatientServiceImpl implements PatientService {
 
     @Override
     public Patient load(String nationalCode) throws SQLException {
-        return patientRepository.load(nationalCode);
+        if (patientRepository.load(nationalCode) != null){
+            return patientRepository.load(nationalCode);
+        }else
+            return null;
     }
 
     @Override

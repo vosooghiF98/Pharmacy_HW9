@@ -30,13 +30,20 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public boolean changePassword(String oldPassword, String newPassword) {
-        return true;
-
+    public boolean changePassword(Admin admin, String newPassword) throws SQLException {
+        if (load(admin.getUsername(), admin.getPassword()) != null){
+            adminrepository.changePassword(admin.getUsername(), admin.getPassword(), newPassword);
+            return true;
+        }
+        return false;
     }
 
     @Override
-    public boolean changeUsername(String oldUsername, String newUsername, String password) {
-        return true;
+    public boolean changeUsername(Admin admin, String newUsername) throws SQLException {
+        if (load(admin.getUsername(), admin.getPassword()) != null){
+            adminrepository.changeUsername(admin.getUsername(), newUsername, admin.getPassword());
+            return true;
+        }
+        return false;
     }
 }
