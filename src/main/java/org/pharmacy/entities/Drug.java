@@ -7,8 +7,9 @@ public class Drug {
     private int quantity;
     private long price;
     private boolean doesExist;
+    private boolean isConfirm;
+    private boolean isPay;
     private long totalPrice;
-
     private String patientNationalCode;
     public Drug(String name, int quantity) {
         this.name = name;
@@ -61,6 +62,22 @@ public class Drug {
 
     public void setPatientNationalCode(String patientNationalCode) {
         this.patientNationalCode = patientNationalCode;
+    }
+
+    public boolean isConfirm() {
+        return isConfirm;
+    }
+
+    public void setConfirm(boolean confirm) {
+        isConfirm = confirm;
+    }
+
+    public boolean isPay() {
+        return isPay;
+    }
+
+    public void setPay(boolean pay) {
+        isPay = pay;
     }
 
     @Override

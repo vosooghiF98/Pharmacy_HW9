@@ -42,7 +42,7 @@ public class PrescriptionRepositoryImpl implements PrescriptionRepository {
     @Override
     public void changeExistMode(boolean exist ,String name) throws SQLException {
         String query = """
-                update prescription set dose_exist = ? where name = ?;
+                update prescription set dose_exist = ? where name = ?
                 """;
         PreparedStatement preparedStatement = DBConfig.getConnection().prepareStatement(query);
         preparedStatement.setBoolean(1,exist);
@@ -52,12 +52,13 @@ public class PrescriptionRepositoryImpl implements PrescriptionRepository {
     }
 
     @Override
-    public void changeConfirmMode(String nationalCode) throws SQLException {
+    public void changeConfirmMode(boolean confirm,String nationalCode) throws SQLException {
         String query = """
-                update prescription set is_confirmed = true where patient_national_code = ?;
+                update prescription set is_confirmed = ? where patient_national_code = ?
                 """;
         PreparedStatement preparedStatement = DBConfig.getConnection().prepareStatement(query);
-        preparedStatement.setString(1,nationalCode);
+        preparedStatement.setBoolean(1,confirm);
+        preparedStatement.setString(2,nationalCode);
         preparedStatement.executeUpdate();
         preparedStatement.close();
     }
@@ -65,10 +66,11 @@ public class PrescriptionRepositoryImpl implements PrescriptionRepository {
     @Override
     public void changePaymentMode(boolean pay, String nationalCode) throws SQLException {
         String query = """
-                update prescription set is_paid = true where patient_national_code = ?;
+                update prescription set is_paid = ? where patient_national_code = ?
                 """;
         PreparedStatement preparedStatement = DBConfig.getConnection().prepareStatement(query);
-        preparedStatement.setString(1,nationalCode);
+        preparedStatement.setBoolean(1,pay);
+        preparedStatement.setString(2,nationalCode);
         preparedStatement.executeUpdate();
         preparedStatement.close();
     }
@@ -88,7 +90,7 @@ public class PrescriptionRepositoryImpl implements PrescriptionRepository {
     @Override
     public Prescription loadBeforeConfirm(Patient patient) throws SQLException {
         String query = """
-                select name,quantity from prescription where patient_national_code = ? and is_confirmed = false
+                select name,quantity,patient_national_code,is_confirmed from prescription where patient_national_code = ? and is_confirmed = false
                 """;
         PreparedStatement preparedStatement = DBConfig.getConnection().prepareStatement(query);
         preparedStatement.setString(1, patient.getNationalCode());
@@ -96,6 +98,8 @@ public class PrescriptionRepositoryImpl implements PrescriptionRepository {
         Prescription prescription = new Prescription();
         while (resultSet.next()){
             Drug drug = new Drug(resultSet.getString("name"),resultSet.getInt("quantity"));
+            drug.setPatientNationalCode(resultSet.getString("patient_national_code"));
+            drug.setConfirm(resultSet.getBoolean("is_confirmed"));
             prescription.add(drug);
         }
         preparedStatement.close();
@@ -105,7 +109,7 @@ public class PrescriptionRepositoryImpl implements PrescriptionRepository {
     @Override
     public Prescription loadAfterConfirm(Patient patient) throws SQLException {
         String query = """
-                select name,quantity,dose_exist,price,patient_national_code from prescription where patient_national_code = ? and is_confirmed = true and is_paid = false
+                select name,quantity,dose_exist,price,patient_national_code,is_confirmed,is_paid from prescription where patient_national_code = ? and is_confirmed = true and is_paid = false
                 """;
         PreparedStatement preparedStatement = DBConfig.getConnection().prepareStatement(query);
         preparedStatement.setString(1, patient.getNationalCode());
@@ -116,6 +120,8 @@ public class PrescriptionRepositoryImpl implements PrescriptionRepository {
             drug.setDoesExist(resultSet.getBoolean("dose_exist"));
             drug.setPrice(resultSet.getLong("price"));
             drug.setPatientNationalCode(resultSet.getString("patient_national_code"));
+            drug.setConfirm(resultSet.getBoolean("is_confirmed"));
+            drug.setPay(resultSet.getBoolean("is_paid"));
             drug.setTotalPrice();
             prescription.add(drug);
         }
@@ -126,7 +132,7 @@ public class PrescriptionRepositoryImpl implements PrescriptionRepository {
     @Override
     public Prescription loadAll() throws SQLException {
         String query = """
-                select * from prescription where is_confirmed = false order by patient_national_code
+                select * from prescription where is_confirmed=false order by id
                 """;
         PreparedStatement preparedStatement = DBConfig.getConnection().prepareStatement(query);
         ResultSet resultSet = preparedStatement.executeQuery();

@@ -37,6 +37,12 @@ public class Prescription {
     public String getName(int index){
         return drugs[index].getName();
     }
+    public boolean getConfirm(){
+        return drugs[0].isConfirm();
+    }
+    public boolean getPay(){
+        return drugs[0].isPay();
+    }
     public void prescriptionPrice(){
         long prescriptionPrice = 0;
         for (int i = 0; i < size(); i++) {
@@ -48,9 +54,9 @@ public class Prescription {
     public String toString() {
         if (size() != 0) {
             for (int i = 0; i < size(); i++) {
-                System.out.print(drugs[i].toString());
+                System.out.println(drugs[i].toString());
             }
-            return "\n";
+            return "";
         }else
             return null;
     }

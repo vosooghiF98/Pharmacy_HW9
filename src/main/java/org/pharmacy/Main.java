@@ -160,14 +160,19 @@ public class Main {
                     System.out.print("Enter Your Function : ");
                     int button2 = check(1, 5);
                     if (button2 == 1) {
-                        System.out.print("Enter Drug's Name : ");
-                        String name = input.next();
-                        System.out.print("Enter Drug,s Quantity : ");
-                        int quantity = checkQuantity();
-                        if (prescriptionService.save(name, quantity, patient)){
-                            System.out.println("Drug is Add to Your Prescription");
+                        Prescription prescription = prescriptionService.load(patient);
+                        if (prescription == null || !prescription.getConfirm()) {
+                            System.out.print("Enter Drug's Name : ");
+                            String name = input.next();
+                            System.out.print("Enter Drug,s Quantity : ");
+                            int quantity = checkQuantity();
+                            if (prescriptionService.save(name, quantity, patient)) {
+                                System.out.println("Drug is Add to Your Prescription");
+                            } else {
+                                System.out.println("Your Drug's Name is Exist OR Your Prescription is Full!");
+                            }
                         }else {
-                            System.out.println("Your Drug's Name is Exist OR Your Prescription is Full!");
+                            System.out.println("Pay OR Remove Your Last Prescription!");
                         }
                     }
                     if (button2 == 2) {
@@ -178,14 +183,19 @@ public class Main {
                         }
                     }
                     if (button2 == 3){
-                        if (prescriptionService.load(patient) != null) {
+                        Prescription prescription = prescriptionService.load(patient);
+                        if (prescription != null && !prescription.getConfirm() && !prescription.getPay()) {
                             System.out.print("Enter Drug's Name : ");
                             String name = input.next();
-                            System.out.print("Enter New Drug's Name : ");
-                            String newName = input.next();
-                            System.out.print("Enter New Drug,s Quantity : ");
-                            int newQuantity = checkQuantity();
-                            prescriptionService.editPrescription(name, newName, newQuantity, patient);
+                            if (prescription.contains(name)) {
+                                System.out.print("Enter New Drug's Name : ");
+                                String newName = input.next();
+                                System.out.print("Enter New Drug,s Quantity : ");
+                                int newQuantity = checkQuantity();
+                                prescriptionService.editPrescription(name, newName, newQuantity, patient);
+                            }else {
+                                System.out.println("This Name is Not Exist In Your Prescription!");
+                            }
                         }else {
                             System.out.println("Nothing to Edit!");
                         }
@@ -270,8 +280,11 @@ public class Main {
                     if (button4 == 2) {
                         String nationalCode = checkNationalCode();
                         if (patientService.load(nationalCode) != null) {
-                            prescriptionService.changeMode("confirm", true, nationalCode);
-                            System.out.println(nationalCode + " Is Confirmed.");
+                            System.out.print("Are You Sure to Confirm " + nationalCode + " ?(Y/N)");
+                            boolean yn = checkYN();
+                            prescriptionService.changeMode("confirm", yn, nationalCode);
+                            if (yn){
+                                System.out.println(nationalCode + " Is Confirmed.");
                             patient = patientService.load(nationalCode);
                             Prescription prescription = prescriptionService.load(patient);
                             String drugName;
@@ -280,16 +293,19 @@ public class Main {
                                 for (int i = 0; i < prescription.size(); i++) {
                                     drugName = prescription.getName(i);
                                     System.out.print("Does Exist " + drugName + " ?(Y/N)");
-                                    boolean yn = checkYN();
-                                    prescriptionService.changeMode("exist",yn,drugName);
-                                    if (yn){
+                                    yn = checkYN();
+                                    prescriptionService.changeMode("exist", yn, drugName);
+                                    if (yn) {
                                         System.out.print(drugName + " Price Is : ");
                                         price = checkPrice();
-                                        prescriptionService.addPrice(drugName,price,nationalCode);
+                                        prescriptionService.addPrice(drugName, price, nationalCode);
                                     }
                                 }
-                            }else {
+                            } else {
                                 System.out.println("This Patient Don't Have any Prescription!");
+                            }
+                        }else {
+                                System.out.println(nationalCode + " Is Not Confirmed.");
                             }
                         }else {
                             System.out.println("This Patient Is Not Exist!");
@@ -298,8 +314,14 @@ public class Main {
                     if (button4 == 3){
                         String nationalCode = checkNationalCode();
                         if (patientService.load(nationalCode) != null) {
-                            prescriptionService.changeMode("pay", true, nationalCode);
-                            System.out.println(nationalCode + " Payment Accepted.");
+                            System.out.print("Are You Sure to Accept Payment for " + nationalCode + " ?(Y/N)");
+                            boolean yn = checkYN();
+                            prescriptionService.changeMode("pay", yn, nationalCode);
+                            if (yn) {
+                                System.out.println(nationalCode + " Payment Accepted.");
+                            }else {
+                                System.out.println(nationalCode + " Payment Not Accepted.");
+                            }
                         }else {
                             System.out.println("This Patient Is Not Exist!");
                         }

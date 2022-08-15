@@ -38,17 +38,14 @@ public class PrescriptionServiceImpl implements PrescriptionService {
 
     @Override
     public boolean changeMode(String mode, boolean change, String name) throws SQLException {
-        if (loadAll().contains(name)) {
             if (mode.equalsIgnoreCase("exist")) {
                 prescriptionRepository.changeExistMode(change, name);
-            } else if (mode.equalsIgnoreCase("confirm")) {
-                prescriptionRepository.changeConfirmMode(name);
-            } else if (mode.equalsIgnoreCase("pay")) {
+            }else if (mode.equalsIgnoreCase("confirm")) {
+                prescriptionRepository.changeConfirmMode(change,name);
+            }else if (mode.equalsIgnoreCase("pay")) {
                 prescriptionRepository.changePaymentMode(change, name);
             }
             return true;
-        }
-        return false;
     }
     @Override
     public boolean addPrice(String name, long price, String nationalCode) throws SQLException {
