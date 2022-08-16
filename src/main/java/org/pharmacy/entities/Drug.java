@@ -86,6 +86,7 @@ public class Drug {
                 ", quantity=" + quantity +
                 ", price=" + price +
                 ", doesExist=" + doesExist +
+                ", isConfirmed=" + isConfirm+
                 ", totalPrice=" + totalPrice +
                 ", patient's national code=" + patientNationalCode;
     }

@@ -1,6 +1,6 @@
-package org.pharmacy.Repository.impl;
+package org.pharmacy.repository.impl;
 
-import org.pharmacy.Repository.PrescriptionRepository;
+import org.pharmacy.repository.PrescriptionRepository;
 import org.pharmacy.config.DBConfig;
 import org.pharmacy.entities.Drug;
 import org.pharmacy.entities.Patient;

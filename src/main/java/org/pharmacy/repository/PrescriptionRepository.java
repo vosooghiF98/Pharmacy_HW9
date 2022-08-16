@@ -1,4 +1,4 @@
-package org.pharmacy.Repository;
+package org.pharmacy.repository;
 
 import org.pharmacy.entities.Drug;
 import org.pharmacy.entities.Patient;

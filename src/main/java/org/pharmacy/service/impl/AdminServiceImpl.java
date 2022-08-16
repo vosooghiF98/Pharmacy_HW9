@@ -1,7 +1,7 @@
 package org.pharmacy.service.impl;
 
-import org.pharmacy.Repository.AdminRepository;
-import org.pharmacy.Repository.impl.AdminRepositoryImpl;
+import org.pharmacy.repository.AdminRepository;
+import org.pharmacy.repository.impl.AdminRepositoryImpl;
 import org.pharmacy.entities.Admin;
 import org.pharmacy.service.AdminService;
 

@@ -52,11 +52,12 @@ public class Prescription {
     }
     @Override
     public String toString() {
+        String temp = "";
         if (size() != 0) {
             for (int i = 0; i < size(); i++) {
-                System.out.println(drugs[i].toString());
+                temp += drugs[i].toString() + "\n";
             }
-            return "";
+            return temp;
         }else
             return null;
     }

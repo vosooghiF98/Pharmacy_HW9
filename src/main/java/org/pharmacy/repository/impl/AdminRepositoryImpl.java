@@ -1,6 +1,6 @@
-package org.pharmacy.Repository.impl;
+package org.pharmacy.repository.impl;
 
-import org.pharmacy.Repository.AdminRepository;
+import org.pharmacy.repository.AdminRepository;
 import org.pharmacy.config.DBConfig;
 import org.pharmacy.entities.Admin;
 

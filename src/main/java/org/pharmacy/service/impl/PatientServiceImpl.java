@@ -1,7 +1,7 @@
 package org.pharmacy.service.impl;
 
-import org.pharmacy.Repository.PatientRepository;
-import org.pharmacy.Repository.impl.PatientRepositoryImpl;
+import org.pharmacy.repository.PatientRepository;
+import org.pharmacy.repository.impl.PatientRepositoryImpl;
 import org.pharmacy.entities.Patient;
 import org.pharmacy.service.PatientService;
 
