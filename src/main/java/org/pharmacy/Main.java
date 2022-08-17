@@ -111,7 +111,7 @@ public class Main {
                             if (prescription.contains(name)) {
                                 System.out.print("Enter New Drug's Name : ");
                                 String newName = input.next();
-                                System.out.print("Enter New Drug,s Quantity : ");
+                                System.out.print("Enter New Drug's Quantity : ");
                                 int newQuantity = Check.checkQuantity(input);
                                 prescriptionService.editPrescription(name, newName, newQuantity, patient);
                             }else {
@@ -230,7 +230,7 @@ public class Main {
                                     System.out.println(nationalCode + " Is Not Confirmed.");
                                 }
                             }else {
-                                System.out.println(nationalCode + " Is Confirmed later");
+                                System.out.println(nationalCode + " Is Confirmed Early!");
                             }
                         }else {
                             System.out.println("This Patient Is Not Exist!");
